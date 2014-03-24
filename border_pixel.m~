@@ -1,0 +1,19 @@
+function extension = border_pixel(frame)
+%% border pixel extension
+% input: frame
+% output: extended border with 4 pixels in each direction
+
+
+frame_extension = zeros(sim.frame_height+8, sim.frame_width+8);
+% border pixel extension of original frame
+frame_extension(5:4+sim.frame_height, 5:sim.frame_width+4) = frame;
+for i = 1:4
+   frame_extension(i,5:sim.frame_width+4) = frame(1,:);
+   frame_extension(sim.frame_height+9-i,5:sim.frame_width+4) = frame(sim.frame_height,:);
+end
+for j = 1:4
+   frame_extension(:,j) = frame_extension(:,5);
+   frame_extension(:, sim.frame_width+9-j) = frame_extension(:,sim.frame_width+4);
+end
+
+frame_pos_1 = frame_extension;

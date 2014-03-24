@@ -1,0 +1,37 @@
+
+
+blur_length = 12;
+phi = 30;
+phi = phi/180*pi;
+partition_number = 10000;
+
+
+sinphi= sin(phi);
+cosphi= cos(phi);
+
+pixel_in_x = ceil(blur_length*cosphi);
+pixel_in_y = ceil(blur_length*sinphi);
+diagonal_length = norm([pixel_in_x,pixel_in_y],2);
+offset=-(blur_length-diagonal_length)/2;
+
+
+filter = zeros(pixel_in_y,pixel_in_x);
+histo_matrix = zeros(pixel_in_y,pixel_in_x);
+
+x = offset:(blur_length/10000):blur_length-offset;
+y = x*sinphi/cosphi;
+for i=1:length(x)
+    if(x(i)-int(x(i))<0.5)
+        pos_x = floor(x(i));
+    else
+        pos_x = ceil(x(i));
+    end
+    if(y(i)-int(y(i))<0.5)
+        pos_y = floor(y(i));
+    else
+        pos_y = ceil(y(i));
+    end
+    histo_matrix(pos_x,pos_y) = histo_matrix(pos_x,pos_y)+1;
+end
+
+histo_matrix = histo_matrix/norm(histo_matrix,1);

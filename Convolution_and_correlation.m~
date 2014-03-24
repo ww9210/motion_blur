@@ -1,0 +1,23 @@
+close all;
+
+test_image=imread('cameraman.tif');
+figure;
+imshow(test_image);
+
+
+%filter = [0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1];
+filter1 = [0.4 0.3 0.2 0.1];
+conv_image_filter = conv2(test_image, filter1,'same');
+figure;
+imshow(conv_image_filter/255);
+
+%filter = [0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1];
+filter1 = [0.4 0.3 0.2 0.1];
+conv_image_filter1 = xcorr2(test_image, filter1);
+figure;
+imshow(conv_image_filter1/255);
+
+
+a= [0.2 0.2 0.2 0.2];
+b= t(a);
+c= conv2(a,b)

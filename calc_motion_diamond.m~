@@ -1,0 +1,140 @@
+function [motion,prediction] = calc_motion_diamond(last_ups,current)
+
+global sim
+
+% parameters from inputs
+num_in_row = sim.frame_width / sim.blocksize;
+num_in_col = sim.frame_height/ sim.blocksize;
+num_block_all  = num_in_row * num_in_col;
+% define outputs
+motion = zeros(num_block_all, 5);      % 4 col for blocknum, inter prediction, motion vectors
+prediction = zeros(sim.frame_height, sim.frame_width); % predicted result using inter prediction
+
+% loop for blocks
+for blocknum = 1:num_block_all
+    % read current block  
+    block_cell = (fix((blocknum-1)/num_in_row))*sim.blocksize+1;
+    block_floor = block_cell + sim.blocksize-1;
+    block_left = fix(mod((blocknum-1),num_in_row)*sim.blocksize+1);
+    block_right = fix(mod((blocknum-1),num_in_row)*sim.blocksize+sim.blocksize);
+    current_block = current(block_cell:block_floor, block_left:block_right); 
+    % compare current block with those inside search range from last frame 
+    % sim.search_range
+    search_left  = max(1, block_left-sim.search_range);
+    search_right = min(sim.frame_width-7, block_left+sim.search_range);
+    search_cell  = max(1, block_cell-sim.search_range);
+    search_floor = min(sim.frame_height-7, block_cell+sim.search_range);
+    % record the best result and compare with threshold
+    power_block = sum(sum(current_block.^2));
+    
+    SE_min = min(power_block/20, 10000); 
+    % 6400 is given considering an average 12,5 difference for each pixel
+    flag = 0;
+    pos_x = 0;
+    pos_y = 0;
+    pos_z = 1;
+    det_x = 0;
+    det_y = 0;
+%     for i = search_cell:search_floor
+%         for j = search_left:search_right
+%             for k = 1:16
+%                 SE = sum(sum((current_block - last_ups(i:i+sim.blocksize-1,j:j+sim.blocksize-1,k)).^2));
+%                 if SE < SE_min
+%                    SE_min = SE;
+%                    flag = 1;
+%                    pos_x = j - block_left;
+%                    pos_y = i - block_cell;
+%                    pos_z = k;
+%                 end
+%             end
+%         end
+%     end
+
+% search in 4 directions and compare with current position.
+% 1 left, 2 right, 3 above, 4 below, SE_center.
+% current_position defined by block_cell, blockleft
+% searchrange = sim.search_range / 2 ;
+% left: blockcell, blockleft - searchrange, ; till search_range = 1
+% right: blockcell, blockright + searchrange
+% above: blockcell - searchrange, blockleft
+% below: blockcell + searchrange, blockleft
+
+    SE_center   = sum(sum((current_block - last_ups(block_cell:block_floor,block_left:block_right,1)).^2));
+    searchrange = sim.search_range/2;
+    this_range_completed = 0;
+    current_x = block_left;
+    current_y = block_cell;
+% pel    
+    while(searchrange > 1 || this_range_completed == 0)    
+        this_range_completed = 0;
+        SE_interim = 4161600*ones(1,4);
+        % left
+        if current_x-searchrange<search_left
+        else
+            SE_interim(1,1) = sum(sum((current_block - ...,
+                last_ups(current_y:current_y+sim.blocksize-1, ...,
+                current_x-searchrange:current_x-searchrange+sim.blocksize-1,1)).^2)); 
+        end
+        % right
+        if current_x+sim.blocksize-searchrange>search_right
+        else
+            SE_interim(1,2) = sum(sum((current_block - ...,
+                last_ups(current_y:current_y+sim.blocksize-1, ...,
+                current_x+searchrange:current_x+searchrange+sim.blocksize-1,1)).^2)); 
+        end
+        % above
+        if current_y-searchrange<search_cell
+        else
+            SE_interim(1,3) = sum(sum((current_block - ...,
+                last_ups(current_y-searchrange:current_y-searchrange+sim.blocksize-1, ...,
+                current_x:current_x+sim.blocksize-1,1)).^2)); 
+        end
+        % below
+        if current_y+sim.blocksize+searchrange>search_floor
+        else
+            SE_interim(1,4) = sum(sum((current_block - ...,
+                last_ups(current_y+searchrange:current_y+searchrange+sim.blocksize-1, ...,
+                current_x:current_x+sim.blocksize-1,1)).^2)); 
+        end
+        if sum(SE_interim < SE_center)
+            % temporarily equal minimum is not considered.  
+            [SE_center, number] = min(SE_interim);
+            switch number
+                case 1
+                    current_x = current_x - searchrange;
+                case 2
+                    current_x = current_x + searchrange;
+                case 3
+                    current_y = current_y - searchrange;
+                case 4
+                    current_y = current_y + searchrange;
+            end
+        else
+           this_range_completed = 1;
+           searchrange = searchrange/2;
+        end
+    end
+% half-pel and quartel-pel    
+    
+
+%     if flag
+        prediction(block_cell:block_floor, block_left:block_right) = ...,
+        last_ups(block_cell+pos_y:block_cell+pos_y+sim.blocksize-1, ...,
+                 block_left+pos_x:block_left+pos_x+sim.blocksize-1,pos_z);
+        det_x = mod(pos_z-1,4);
+        det_y = fix(pos_z/4-1);
+%     else
+%         prediction(block_cell:block_floor, block_left:block_right) = current_block;
+%     end
+    SE_final = sum(sum((prediction(block_cell:block_floor, block_left:block_right) ...,
+               - current_block).^2));
+    motion(blocknum, :) = [blocknum flag pos_x*4+det_x pos_y*4+det_y SE_final];
+%     disp(blocknum);
+    if mod(blocknum, 160) == 0
+        fprintf('%d ',fix(blocknum/160));
+        if mod(blocknum, 1600) == 0
+            fprintf('\n');
+        end
+    end
+end
+

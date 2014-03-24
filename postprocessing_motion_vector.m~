@@ -1,0 +1,13 @@
+% tmp skript to modify motion_current
+[row, col] = size(motion_current);
+motion_info = zeros(row, 8);
+
+blocksize = 8;
+interpolation_constant = 4;
+num_in_row = 160;
+num_in_col = 90;
+
+block_position = [fix((motion_current(:,1)-1)/num_in_row) mod(motion_current(:,1)-1,num_in_row)];
+motion_info(:,1:4) = [block_position(:,1)*blocksize+1 block_position(:,1)*blocksize+blocksize ...,
+                      block_position(:,2)*blocksize+1 block_position(:,2)*blocksize+blocksize];
+motion_info(:,5) = motion_current(:,3) 

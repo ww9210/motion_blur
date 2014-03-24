@@ -1,0 +1,28 @@
+function pic_sequence = read_sequence(filename, num_of_pic, pic_begin, pic_width,pic_height)
+
+
+%% read test sequences to matlab from YUV file. 
+% filename:  yuv document
+% num_of_pic = 10;
+% pic_begin = 11;
+% pic_end   = 20;
+% pic_width = 1280;
+% pic_height= 720;
+
+%%
+pic_sequence = cell(num_of_pic,1);
+
+fid = fopen(filename,'r');
+for i=1:num_of_pic
+%     pic_sequence{i} = zeros(pic_height, pic_width);
+    pos = (i+pic_begin-1)*pic_width*pic_height*1.5;
+    fseek(fid, pos, 'bof');
+    tmp = fread(fid,pic_width*pic_height);
+    tmp_matrix = zeros(pic_height, pic_width);
+    for j = 1:pic_height
+        tmp_matrix(j,:) = tmp( (j-1)*pic_width+1 : (j-1)*pic_width+pic_width);
+    end
+    pic_sequence{i} = tmp_matrix;
+end 
+fclose(fid);
+

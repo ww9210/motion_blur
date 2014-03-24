@@ -1,0 +1,68 @@
+function ups  = interpolation(frame)
+
+global sim
+%% interpolation based on HEVC.
+% input:  frame from sequence 
+% output: upsampled frame with 4x in resolution
+
+%% coefficents: h[] for half pel, q[] for quartel pel
+hfilter = [-1, 4, -11, 40, 40, -11, 4, -1];
+hfilter_tran = hfilter';
+qfilter = [-1, 4, -10, 58, 17, -5, 1];
+qfilter_tran = qfilter';
+
+h_vert = zeros(sim.frame_height,8); 
+q_vert = zeros(sim.frame_height,7);
+
+h_hori = zeros(8,sim.frame_width);
+q_hori = zeros(7,sim.frame_width);
+
+for i=1:sim.frame_height
+    h_vert(i,:) = hfilter;
+    q_vert(i,:) = qfilter;
+end
+for j=1:sim.frame_width
+    h_hori(:,j) = hfilter_tran;
+    q_hori(:,j) = qfilter_tran;
+end
+
+%% define output and interim buffer 
+ups = zeros(4*sim.frame_height, 4*sim.frame_width);
+
+A = frame;
+a = zeros(sim.frame_height,sim.frame_width);
+b = zeros(sim.frame_height,sim.frame_width);
+c = zeros(sim.frame_height,sim.frame_width);
+d = zeros(sim.frame_height,sim.frame_width);
+e = zeros(sim.frame_height,sim.frame_width);
+f = zeros(sim.frame_height,sim.frame_width);
+g = zeros(sim.frame_height,sim.frame_width);
+h = zeros(sim.frame_height,sim.frame_width);
+i = zeros(sim.frame_height,sim.frame_width);
+j = zeros(sim.frame_height,sim.frame_width);
+k = zeros(sim.frame_height,sim.frame_width);
+n = zeros(sim.frame_height,sim.frame_width);
+p = zeros(sim.frame_height,sim.frame_width);
+q = zeros(sim.frame_height,sim.frame_width);
+r = zeros(sim.frame_height,sim.frame_width);
+
+%% interpolation
+% 1. boundary a,b,c,d,h,n based on A
+A_ext = border_pixel(A);
+a = interpolate_pixel(A_ext, q_vert, 'left');
+b = interpolate_pixel(A_ext, h_vert);
+c = interpolate_pixel(A_ext, q_vert, 'right');
+d = interpolate_pixel(A_ext, q_hori, 'above');
+h = interpolate_pixel(A_ext, h_hori);
+n = interpolate_pixel(A_ext, q_hori, 'below');
+
+% 2. inside e,f,g,i,j,k,p,q,r based on a,b,c 
+a_ext = border_pixel(a);
+b_ext = border_pixel(b);
+c_ext = border_pixel(c);
+
+e = interpolate_pixel(a_ext, q_hori, 'above');
+i = interpolate_pixel(a_ext, h_hori);
+p = interpolate_pixel(a_ext, q_hori, 'below');
+
+
