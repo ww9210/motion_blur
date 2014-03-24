@@ -1,6 +1,17 @@
 ###############
 #    folder   #
 ###############
+
+*.mat
+*.m~
+!*.m
+
 /Result/
 /motion_vector/
 
+
+*.mat
+
+*.mat
+
+Result alias
