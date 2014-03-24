@@ -15,3 +15,5 @@
 *.mat
 
 Result alias
+
+.DS_Store
