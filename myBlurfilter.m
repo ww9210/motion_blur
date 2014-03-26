@@ -101,6 +101,6 @@ if(flag==4)
         length=1;
     end
     
-    blur_filter = filter_intersection(2.5,theta);
+    blur_filter = filter_intersection(3.5,theta);
     return;
 end

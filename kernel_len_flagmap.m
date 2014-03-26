@@ -8,7 +8,8 @@ sim.second_MV = 1;
 sim.FilterDirection = 0;
 sim.Filter_first_half = 1;
 begin_frame = 24;
-end_frame = 30;
+end_frame = 48;
+
 %% read the motion vector from file
 intersection_mv_all = zeros(end_frame-begin_frame+1,14400,9);
 for frame=begin_frame:end_frame
@@ -29,9 +30,39 @@ for frame=begin_frame:end_frame
     %tic
     %   mydataread(filename,outputname,14400) ;
     %toc
-   len_25_intersection_mv_all(frame-(begin_frame-1),:,:) = load(outputname);
+    len_25_intersection_mv_all(frame-(begin_frame-1),:,:) = load(outputname);
+end
+len_15_intersection_mv_all = zeros(end_frame-begin_frame+1,14400,9);
+for frame=begin_frame:end_frame
+    %filename            =   strcat('./Result/intersection/',int2str(frame),'.txt');
+    outputname = strcat('./Result/len_1.5_intersection/',int2str(frame),'.txt');
+    fprintf('reading frame %d\n',frame);
+    %tic
+    %   mydataread(filename,outputname,14400) ;
+    %toc
+    len_15_intersection_mv_all(frame-(begin_frame-1),:,:) = load(outputname);
+end
+len_35_intersection_mv_all = zeros(end_frame-begin_frame+1,14400,9);
+for frame=begin_frame:end_frame
+    %filename            =   strcat('./Result/intersection/',int2str(frame),'.txt');
+    outputname = strcat('./Result/len_3.5_intersection/',int2str(frame),'.txt');
+    fprintf('reading frame %d\n',frame);
+    %tic
+    %   mydataread(filename,outputname,14400) ;
+    %toc
+    len_35_intersection_mv_all(frame-(begin_frame-1),:,:) = load(outputname);
 end
 
+len_30_intersection_mv_all = zeros(end_frame-begin_frame+1,14400,9);
+for frame=begin_frame:end_frame
+    %filename            =   strcat('./Result/intersection/',int2str(frame),'.txt');
+    outputname = strcat('./Result/len_3_intersection/',int2str(frame),'.txt');
+    fprintf('reading frame %d\n',frame);
+    %tic
+    %   mydataread(filename,outputname,14400) ;
+    %toc
+    len_30_intersection_mv_all(frame-(begin_frame-1),:,:) = load(outputname);
+end
 
 hybrid_result = zeros(end_frame-begin_frame+1,14400,10);
 hybrid_result(:,:,1:9) = intersection_mv_all;
@@ -42,15 +73,28 @@ for frame_no=1:end_frame-begin_frame+1
     %blurinfo_fspecial = reshape(len_2.5_intersection_mv_all(frame_no,:,:),14400,9);
     %hybrid_result(frame_no,:,:) = blurinfo_intersection (frame_no,:,:);
     for i = 1:14400
-        hybrid_result(frame_no,i,2) = max(intersection_mv_all(frame_no,i,2),len_25_intersection_mv_all(frame_no,i,2));
-        hybrid_result(frame_no,i,5) = min(intersection_mv_all(frame_no,i,5),len_25_intersection_mv_all(frame_no,i,5));
+        hybrid_result(frame_no,i,2) = max(max(max(max(intersection_mv_all(frame_no,i,2),len_25_intersection_mv_all(frame_no,i,2)),len_35_intersection_mv_all(frame_no,i,2)),len_30_intersection_mv_all(frame_no,i,2)),len_15_intersection_mv_all(frame_no,i,2));
+        hybrid_result(frame_no,i,5) = min(min(min(min(intersection_mv_all(frame_no,i,5),len_25_intersection_mv_all(frame_no,i,5)),len_35_intersection_mv_all(frame_no,i,5)),len_30_intersection_mv_all(frame_no,i,5)),len_15_intersection_mv_all(frame_no,i,5));
         if(hybrid_result(frame_no,i,2)==1)
             hybrid_result(frame_no,i,10)=0;
         else
-            if(intersection_mv_all(frame_no,i,5)<len_25_intersection_mv_all(frame_no,i,5))
-                hybrid_result(frame_no,i,10)=1;%intersection is better
-            else
-                hybrid_result(frame_no,i,10)=2;%intersection len 2.5 is better
+            if(hybrid_result(frame_no,i,5) == intersection_mv_all(frame_no,i,5))
+                hybrid_result(frame_no,i,10)=1;%intersection len 2 is better
+                
+            else if (hybrid_result(frame_no,i,5) == len_25_intersection_mv_all(frame_no,i,5))
+                    hybrid_result(frame_no,i,10)=2;%intersection len 2.5 is better
+                    
+                else if(hybrid_result(frame_no,i,5) == len_35_intersection_mv_all(frame_no,i,5))
+                        hybrid_result(frame_no,i,10)=3;%intersection len 3.5 is better
+                    else if (hybrid_result(frame_no,i,5) == len_30_intersection_mv_all(frame_no,i,5))
+                            hybrid_result(frame_no,i,10)=4;
+                        else if (hybrid_result(frame_no,i,5) == len_15_intersection_mv_all(frame_no,i,5))
+                                hybrid_result(frame_no,i,10)=5;
+                            end
+                        end
+                    end
+                end
+                
             end
         end
         %blurinfo = moiton_current(:,[1,2,8,9,6]);
@@ -93,15 +137,29 @@ for frame = 1:end_frame-begin_frame+1
                     RGB_noblur((row*8-7):(row*8),(col*8-7):(col*8),1)=0;%blue for intersection len 2.5 is better
                     RGB_noblur((row*8-7):(row*8),(col*8-7):(col*8),2)=0;
                     RGB_noblur((row*8-7):(row*8),(col*8-7):(col*8),3)=1;
-                    
+                else if hybrid_result(frame,i,10)==3
+                        RGB_noblur((row*8-7):(row*8),(col*8-7):(col*8),1)=0;%cyen for intersection len 3.5 is better
+                        RGB_noblur((row*8-7):(row*8),(col*8-7):(col*8),2)=1;
+                        RGB_noblur((row*8-7):(row*8),(col*8-7):(col*8),3)=1;
+                    else if hybrid_result(frame,i,10)==4
+                            RGB_noblur((row*8-7):(row*8),(col*8-7):(col*8),1)=0.3;%green for intersection len 3 is better
+                            RGB_noblur((row*8-7):(row*8),(col*8-7):(col*8),2)=1;
+                            RGB_noblur((row*8-7):(row*8),(col*8-7):(col*8),3)=0;
+                        else if hybrid_result(frame,i,10)==5
+                                RGB_noblur((row*8-7):(row*8),(col*8-7):(col*8),1)=0.8;%red for intersection len 1.5 is better
+                                RGB_noblur((row*8-7):(row*8),(col*8-7):(col*8),2)=0.2;
+                                RGB_noblur((row*8-7):(row*8),(col*8-7):(col*8),3)=0.2;
+                            end
+                        end
+                    end
                 end
             end
             
         end
     end
-    mkdir('./Result/pics/','vary_kernel_len');
-    mkdir('./Result/pics/vary_kernel_len','intersection');
-    imwrite(RGB_noblur,strcat('./Result/pics/vary_kernel_len/intersection/blur_compensation_compare_frame:',num2str(frame+23),'.tiff'))
+   % mkdir('./Result/pics/','vary_kernel_len');
+   % mkdir('./Result/pics/vary_kernel_len','intersection');
+   % imwrite(RGB_noblur,strcat('./Result/pics/vary_kernel_len/intersection/blur_compensation_compare_frame:',num2str(frame+23),'.tiff'))
 end
 %figure;
 %imshow(RGB_noblur);

@@ -1,7 +1,7 @@
 % main skript
 blur_estimation_SE_vector = 0;
 motion_SE_vector = 0;
-for begin_of_frames=24:30
+for begin_of_frames=24:48
     %% inputs
     filename            =   '../Testsequenzen/yuv/playground.yuv';
     %begin_of_frames     =   41;
@@ -90,8 +90,8 @@ for begin_of_frames=24:30
     % plot frame and record blurring_info
     %         imwrite(current,strcat('./Result/frames/',num2str(num)),'jpg');
     % RGB=visualization_blurinfo(blurring_info,frame_last_1,frame_current,frame_current_prediction,begin_of_frames);
-    mkdir('./Result','len_3.5_intersection')
-    str = strcat('./Result/len_3.5_intersection/frame:',num2str(begin_of_frames),'_',datestr(now),'_blurring_info.txt');
+    %mkdir('./Result','len_3.5_intersection')
+    str = strcat('./Result/len_1.5_intersection/',num2str(begin_of_frames),'.txt');
     [height, width] = size(blurring_info);
     fid = fopen(str, 'wt');
     for i = 1:height
