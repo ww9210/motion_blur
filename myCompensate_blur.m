@@ -113,7 +113,7 @@ for blocknum = 1:num_block_all
                                            pos_x:pos_x+sim.blocksize-1,pos_z);
             % calculation of real motion after blurring 
                 det_x = mod(pos_z-1,4);
-                det_y = fix(pos_z/4-1);                               
+                det_y = fix((pos_z-1)/4);                               
                 motion_y = (- block_cell + imageblock_cell + pos_y-1)*4 + det_y;
                 motion_x = (- block_left + imageblock_left + pos_x-1)*4 + det_x;
                 blurring_info(blocknum,:) = [blocknum 2 motion_x motion_y...

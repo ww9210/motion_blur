@@ -1,0 +1,7 @@
+
+Using intersection filter of lenghth 2.5 to do blur compensation
+
+
+Data generated: 
+1. Motion vectors and predicted frame using only motion compensation @ 'Result/moiton_vector '
+2. Error information using intersection filter of length 2.5 @ 'Result'

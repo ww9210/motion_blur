@@ -1,0 +1,39 @@
+____________________________
+
+Experiments
+____________________________
+1. Variable intersection kernel length(1.5 2 2.5 3 3.5) was used for blur compensatation 
+
+blurinfo @ /motion_blur/Result/intersection
+
+2. draw the flag map of different kernel lengths(2 2.5) (2 2.5 3.5) (1.5 2 2.5 3 3.5) 
+
+flagmap @ /motion_blur/Result/pics/vary_kernel_len 
+
+3. Search motion vector only once with intersection kernel length of (1.5 2 2.5) separately and the result is very poor
+
+blurinfo @ /motion_blur_copy/Result/no_2nd_search*.txt
+
+4. Trying to separate background from foreground by setting a threshold of the magnitude of motion vector
+
+demo: @/motion_blur/angle_differ_intersection_demo.m
+___________________________
+
+Chart and data generated:
+___________________________
+(1) chart search once or twice: using multiple kernel length (1.5 2 2.5) to compare search mv for only once and twice
+
+(2) chart hybrid: try to use multiple blur kernel length to compensate for the blur
+	a.(2 2.5 3.5)
+	b.(1.5 2 2.5 3 3.5)
+
+___________________________
+
+Questions
+___________________________
+1. Why only searching once yields poor results comparing to 2nd search?
+2. How to improve the result using only one motion vector search?
+3. Where to use blur compensation? 
+4. What length of kernel should be used(is best)?
+5. How to decide which kernel to use?
+6. Does global motion vector statistics always help differentiate background and foreground?
