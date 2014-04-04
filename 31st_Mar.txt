@@ -1,0 +1,18 @@
+____________________________
+
+Experiments
+____________________________
+1. Model the motion vector magnitude distribution as gaussian mixtures. Using Expectation Maximization(EM) algorithm of gaussian mixture model(gmm) to inference the model parameter. The motion vectors are then labelled according to its likelihood of each gaussian distribution. A segmentation is then gernerated for blur compensation because different regions are likely to represent different blur length.
+___________________________
+
+Chart and data generated:
+___________________________
+(1) the segmentation of the magnitude of motion vectors in 24~48 frame from playground.yuv 
+
+@motion_blur/Result/pics/gmm_flagmap_intersection
+
+___________________________
+
+Questions
+___________________________
+1. As the gmm of motion vector distribution helps partition the frame to regions, then the identification of regions in consecutive frames are meaningful for calculating a reasonabel kernel length.

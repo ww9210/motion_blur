@@ -1,0 +1,12 @@
+Reading and debuging the code of HM 13.0. 
+
+Locating the function 'xCompressCU' and 'xCheckRDCostMerge2Nx2N' and 'xCheckRDCostInter'. To better understand the code, read HEVC overview.
+To understand the code, rate distortion theory is very important.
+
+
+'xEstimateMvPredAMVP': AMVP
+'xGetTemplateCost':	Generate motion-compensated luma block
+
+Questions:
+1.How to add blur compensation to the 'xCheckRDCostInter'?
+2.How to get the statistics(store all the motion vectors) of a whole frame image

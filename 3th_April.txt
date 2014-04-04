@@ -1,0 +1,18 @@
+1. Trying to get and store the motion vector in the BestCU
+	step1: modify the class TComDataCU and add two fields, one for the motion vector list(frame) indicator, and the other for the field to store the motion vector searched by function "predInterSearch".
+
+	step2: modify the function "predInterSearch" to store the mv and the reflist number in the added fields of rpcTempCU
+
+	step3: modify the function "xCheckBestMode" to store the motion vector and the reflist number in the fields of rpcBestCU
+
+2. See Laude's predInterSearch code
+
+3. The function of PredInterSearch is to search for the best candidate for inter prediciton in rpcBestCU, then the candidate will be blurred in a reference picture list and search motion vector again in a new function.
+
+4. After getting the information of mv in rpcBestCU, we need to blur the reference region(larger area should be blurred due to possible shifting after convolution) and store it as a reference frame with other region set to 0. Then do a second search in the added reference frame for the best motion vector(where to store the second motion vector?), the difference between the two motion vector search should be stored later.
+
+5. Question: 
+	1) what is mvD? 
+	2) should it be recorded?
+	3) Why store the mv in rpcBest even the cost of temp is worse than current best?
+    4) In the matlab code the second search is done in the function blur_Compensation, where to do second search in the  HM code

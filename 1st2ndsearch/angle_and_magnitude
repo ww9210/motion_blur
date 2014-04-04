@@ -1,0 +1,16 @@
+\documentclass{article}
+\usepackage{geometry}  
+%\geometry{letterpaper}   
+\usepackage{graphicx}
+\usepackage{amssymb}
+ 
+\title{Using two kernels for motion blur compensation}
+\author{Wei WU}
+ 
+\begin{document}
+ 
+\maketitle{}
+
+
+
+\end{document}

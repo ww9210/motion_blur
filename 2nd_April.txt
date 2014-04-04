@@ -1,0 +1,46 @@
+function xCompressCU can be divided into three blocks:
+//the first block:
+	if(rpcBestCU->getSlice()->getSliceType()!=I_Slice) //check whether is I slice 
+	{
+		xCheckRDCostInter( rpcBestCU, rpcTempCU, SIZE_2Nx2N );  
+  
+    	xCheckRDCostMerge2Nx2N( rpcBestCU, rpcTempCU, &earlyDetectionSkipMode );  
+	}
+
+//the second block:
+for(Int iQP=iMinQP; iQP<=iMaxQP; iQP++)
+// do inter modes, NxN, 2NxN, and Nx2N
+	if(rpcBestCU->getSlice()->getSliceType()!=I_Slice)
+	{
+		xcheckRDCostInter(rpcBestCU, rpcTempCU, SIZE_NxN);
+		xcheckRDCostInter(rpcBestCU, rpcTempCU, SIZE_Nx2N);
+		xcheckRDCostInter(rpcBestCU, rpcTempCU, SIZE_2Nx2N);
+	}
+
+	//! Try AMP
+	// do normal intra modes // speedup for inter frames
+	{  
+        xCheckRDCostIntra( rpcBestCU, rpcTempCU, SIZE_2Nx2N );  
+        xCheckRDCostIntra( rpcBestCU, rpcTempCU, SIZE_NxN   );  
+  
+    }   
+    xcheckIntraPCM(rpcBestCU, rpcTempCU); 
+ //the third block    
+ 	for(Uint uiPartUnitIdx = 0; uiPartUnitIdx < 4; uiPartUnitIdx++)
+ 	//further split
+ 	{
+ 		if( rpcBestCU->isIntra(0) )
+ 			xCompressCU( pcSubBestPartCU, pcSubTempPartCU, uhNextDepth, SIZE_NONE);
+ 		else
+ 			xCompressCU(pcSubBestPartCU, pcSubTempPartCU, uhNextDepth, rpcBestCU->getPartitionSize(0));
+ 	}
+ 	//then check whether to use split
+ 	xcheckBestMode(rpcBestCU, rpcTempCU,uiDepth);
+
+
+The first two blocks calculate the RDcost of the pattern that current LCU used, the last block calculate the divide of the layer down.
+At last, call xCheckBestMode to decide whether use the partition.
+
+
+
+function "xCheckRDCostInter": the motion vector information should be stored in the object "rpcTempCU" before it is re-initialized, so we can get the information before it.

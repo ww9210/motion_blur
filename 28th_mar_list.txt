@@ -1,0 +1,19 @@
+implementation of Intersection Kernel for blur;
+
+try nonlinear filter;
+
+try the code of "Analyzing motion varying blur";
+
+read and debug the source code of "myblockmatcher.cpp";
+
+investigate the relationship between motion vector size and objects;
+
+Variable intersection kernel length(1.5 2 2.5 3 3.5) was used for blur compensatation 
+
+draw flagmap of kernel 1.5 2 2.5 3 3.5
+
+compare SE of search motion vector for only once and twice
+
+compare SE of using intersection and fspecial filter
+
+compare SE of using variable length fspecial kernel

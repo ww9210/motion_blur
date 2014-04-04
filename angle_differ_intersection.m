@@ -22,7 +22,7 @@ close all;
 %% calculate the angle of the 1st and 2nd motion vector
 frame=1;
 tic
-for frame=5:5
+for frame=1:25
     
     flag = intersection_mv_all(frame,:,2);
     
@@ -80,7 +80,7 @@ for frame=5:5
     %% visualize the length of the 1st and 2nd motion vector
     
     magnitude_1st = abs(complex_vector_1st);
-    hist(magnitude_1st,100);
+    %hist(magnitude_1st,100);
    % figure;
     magnitude_2nd = abs(complex_vector_2nd);
     magnitude_dif = magnitude_1st -  magnitude_2nd;
@@ -129,8 +129,8 @@ for frame=5:5
             RGB_mag_dif((row*8-7):(row*8),(col*8-7):(col*8),3)=0;
         end
     end
-    figure;
-    imshow(RGB_mag_dif);
+   % figure;
+   % imshow(RGB_mag_dif);
     
     
     %% show the magnitude of all the motion vectors
@@ -146,6 +146,18 @@ for frame=5:5
     %imshow(RGB_mag);
     mkdir('./Result/pics','mv_mag');
     imwrite(RGB_mag,strcat('./Result/pics/mv_mag/blur_compensation_compare_frame:',num2str(frame+23),'.tiff'))
+    
+    %% show the angle of all motion vectors
+    RGB_ang = zeros(sim.frame_height,sim.frame_width,3);
+    for i = 1:14400
+        row = fix(i/num_in_row)+1;
+        col = fix(mod((i-1),num_in_row)+1);
+        RGB_ang((row*8-7):(row*8),(col*8-7):(col*8),1)=0;%yello for no blur compensation
+        RGB_ang((row*8-7):(row*8),(col*8-7):(col*8),2)=1-angle_1st(i)/360;
+        RGB_ang((row*8-7):(row*8),(col*8-7):(col*8),3)=1-angle_1st(i)/360;   
+    end
+    mkdir('./Result/pics','mv_ang');
+    imwrite(RGB_ang,strcat('./Result/pics/mv_ang/blur_compensation_compare_frame:',num2str(frame+23),'.tiff'))
     
 end
 toc
