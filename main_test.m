@@ -90,7 +90,8 @@ for begin_of_frames=24:48
     % plot frame and record blurring_info
     %         imwrite(current,strcat('./Result/frames/',num2str(num)),'jpg');
     % RGB=visualization_blurinfo(blurring_info,frame_last_1,frame_current,frame_current_prediction,begin_of_frames);
-    str = strcat('./Result/len_3.5_intersection/',num2str(begin_of_frames),'.txt');
+    mkdir('./Result','linear_threshold_intersection')
+    str = strcat('./Result/linear_threshold_intersection/',num2str(begin_of_frames),'.txt');
     [height, width] = size(blurring_info);
     fid = fopen(str, 'wt');
     for i = 1:height
@@ -108,3 +109,11 @@ for begin_of_frames=24:48
     %fprintf(fid,'block using ME = %d\n', num_motion);
     fclose(fid);
 end
+blur_estimation_SE_vector=int32(blur_estimation_SE_vector(2:end));
+motion_SE_vector = int32(motion_SE_vector(2:end));
+str =  strcat('./Result/linear_threshold_intersection/','blur_estimation_SE_vector','.txt');
+fid = fopen(str, 'wt');
+for i=1:length(blur_estimation_SE_vector)
+     fprintf(fid, '%d \n', blur_estimation_SE_vector(i));
+end
+fclose(fid);

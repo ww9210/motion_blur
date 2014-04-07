@@ -68,7 +68,7 @@ for blocknum = 1:num_block_all
         % y direction
     % generate blurring for block
         % filters
-        blur_filter_2D = myBlurfilter(motion_current(blocknum,3),motion_current(blocknum,4),4);
+        blur_filter_2D = myBlurfilter(motion_current(blocknum,3),motion_current(blocknum,4),5,80);
         % blurring
     % blurring image block  
     % &

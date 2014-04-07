@@ -1,4 +1,4 @@
-function blur_filter=myBlurfilter(x,y,flag)
+function blur_filter=myBlurfilter(x,y,flag,threshold)
 %flag=1 :using fspecial(length=2,angle=motion angle)
 global sim
 
@@ -40,7 +40,7 @@ end
 %     %[rows,cols] = size(nonlinear_parameter)
 %     nonlinear = nonlinear_parameter(filter_nom,:);
 %     nonlinear_matrix = zeros(3,3);
-%     
+%
 %     nonlinear_matrix(1,1) = nonlinear(1);
 %     nonlinear_matrix(3,1) = nonlinear(1);
 %     nonlinear_matrix(3,3) = nonlinear(1);
@@ -78,7 +78,7 @@ end
 %     %[rows,cols] = size(nonlinear_parameter)
 %     nonlinear = nonlinear_parameter(filter_nom,:);
 %     nonlinear_matrix = zeros(3,3);
-%     
+%
 %     nonlinear_matrix(1,1) = nonlinear(3);
 %     nonlinear_matrix(3,1) = nonlinear(3);
 %     nonlinear_matrix(3,3) = nonlinear(3);
@@ -103,4 +103,19 @@ if(flag==4)
     
     blur_filter = filter_intersection(3.5,theta);
     return;
+end
+%% flag=5 means using the linear_threshold_intersection filter
+if(flag==5)
+    theta = atan2(x,y)*180/pi;
+    
+    length=abs(norm([x,y]));
+    if (length<threshold)
+        blur_filter = filter_intersection(1.5,theta);
+        return;
+    end
+    
+    if (length>=threshold)
+        blur_filter = filter_intersection(3,theta);
+        return;
+    end
 end
